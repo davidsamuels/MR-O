@@ -8,7 +8,7 @@
 
 // Which pin on the Arduino is connected to the NeoPixels?
 // On a Trinket or Gemma we suggest changing this to 1:
-#define LED_PIN 6
+#define LED_PIN 15
 
 // How many NeoPixels are attached to the Arduino?
 #define LED_COUNT 8
@@ -38,23 +38,24 @@ void setup() {
 
   strip.begin();  // INITIALIZE NeoPixel strip object (REQUIRED)
   strip.show();   // Turn OFF all pixels ASAP
-  strip.setBrightness(BRIGHTNESS);
+  strip.setBrightness(BRIGHTNESS); 
   Serial.begin(9600);
 }
 
 void loop() {
 
 
-  noise = analogRead(micPin);  // 0-1023 range of values
+  noise = analogRead(micPin);  // 0-1023 range of values on arduino 0-4096 for pi pico
   sensitivity = analogRead(sensitivityPin);
   
   if (noise > sensitivity ) {
+    strip.setBrightness((noise/4096*255)-noise);//for pi pico
     strip.rainbow(0, 1, 255, 150, true);
     strip.show();
  
 
 
-    //delay(200);
+    delay(200);
   } 
   else {
     strip.fill(0, 0, 0);  // turn the strip off if its not loud enought
