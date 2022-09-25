@@ -47,8 +47,10 @@ void loop() {
 
   noise = analogRead(micPin);  // 0-1023 range of values on arduino 0-4096 for pi pico
   sensitivity = analogRead(sensitivityPin);
+  strip.updateLength(noise/4096*10*LED_COUNT);
   
   if (noise > sensitivity ) {
+    
     strip.setBrightness((noise/4096*255)-noise);//for pi pico
     strip.rainbow(0, 1, 255, 150, true);
     strip.show();
@@ -56,6 +58,8 @@ void loop() {
 
 
     delay(200);
+    strip.fill(0, 0, 0);  // turn the strip off if its not loud enought
+    strip.show();
   } 
   else {
     strip.fill(0, 0, 0);  // turn the strip off if its not loud enought
@@ -66,7 +70,9 @@ void loop() {
   Serial.print("noise\t");
   Serial.print(noise);
   Serial.print("\tsensitivity\t");
-  Serial.println(sensitivity);
+  Serial.print(sensitivity);
+  Serial.print("\t number of leds\t");
+  Serial.println(noise/4096*10*LED_COUNT);
  
 
 }
