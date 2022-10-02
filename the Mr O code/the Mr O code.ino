@@ -62,22 +62,20 @@ while (activity > threshold)               // while the mic is picking up the dr
   }
   
   strip.show();
-  Serial.print("noise\t");
-  Serial.print(noise);
+  
   Serial.print("\threshold\t");
   Serial.print(threshold);
   Serial.print("\tabs noise - background\t ");
-  Serial.println( abs(noise-background));
+  Serial.println( activity);
   noise = analogRead(micPin);
   activity = abs(noise-background);
-  delay(500);
+  delay(1000);
 }
 // Serial.print("noise\t");
 //   Serial.print(noise);
 //   Serial.print("\tabs noise - background\t ");
 //   Serial.println( abs(noise-background));
- Serial.print("noise\t");
-  Serial.print(noise);
+ 
   Serial.print("\threshold\t");
   Serial.print(threshold);
   Serial.print("\tabs noise - background\t ");
