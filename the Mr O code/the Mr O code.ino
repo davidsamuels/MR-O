@@ -31,11 +31,16 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 //   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
 
 float noise = 500;            // var for storing output of microphone
-float threshold = 50;        // loudness mic must pass before lights turn on
+float threshold = 50;         // loudness mic must pass before lights turn on
 float sensitivity = 1;        // a multiplier for threshold which will on the fly modify its value
 float background = 1024 / 2;  // dead mic signal is vsource/2 analog val max is 1024
 float activity = 0;
 long randomColor = 0;
+
+float activityHistory[200];  // holds historical data from mic
+float activityDer[200 - 1];
+float temp1Der = 0;
+int rollingTracker = 0;
 
 void setup() {
 
@@ -49,41 +54,51 @@ void loop() {
 
   // for adafruit microphone the value of a quite room is 510 noise = analogRead(micPin);  // 0-1023 range of values on arduino 0-4096 for pi pico
   noise = analogRead(micPin);
-  activity = abs(noise-background);
-while (activity > threshold)               // while the mic is picking up the drum
-{
-  //strip.setBrightness(abs(noise - background) * 255);
-  //strip.rainbow(0, 1, 255, 150, true);
-  randomColor = random(0,65535);
-  for(int i =0; i<LED_COUNT ;i++)
-  { 
-  strip.setPixelColor(i,strip.ColorHSV(randomColor,255,255));
-
-  }
-  
-  strip.show();
+  activity = abs(noise - background);
+  activityHistory[rollingTracker] = activity;
+  temp1Der = activityHistory[rollingTracker + 1] - activityHistory[rollingTracker];
+  activityDer[rollingTracker] = temp1Der;
+  rollingTracker++;
   Serial.print("noise\t");
   Serial.print(noise);
-  Serial.print("\threshold\t");
-  Serial.print(threshold);
-  Serial.print("\tabs noise - background\t ");
-  Serial.println( abs(noise-background));
-  noise = analogRead(micPin);
-  activity = abs(noise-background);
-  delay(500);
-}
-// Serial.print("noise\t");
-//   Serial.print(noise);
-//   Serial.print("\tabs noise - background\t ");
-//   Serial.println( abs(noise-background));
- Serial.print("noise\t");
-  Serial.print(noise);
-  Serial.print("\threshold\t");
-  Serial.print(threshold);
-  Serial.print("\tabs noise - background\t ");
-  Serial.println( abs(noise-background));
-strip.fill(0, 0, 0);
-strip.show();
+  Serial.print("\tfirst derr\t");
+  Serial.println(temp1Der);
+  if(rollingTracker == 199)
+    rollingTracker =0;
+
+
+  // while (activity > threshold)               // while the mic is picking up the drum
+  // {
+  //   //strip.setBrightness(abs(noise - background) * 255);
+  //   //strip.rainbow(0, 1, 255, 150, true);
+  //   randomColor = random(0,65535);
+  //   for(int i =0; i<LED_COUNT ;i++)
+  //   {
+  //   strip.setPixelColor(i,strip.ColorHSV(randomColor,255,255));
+
+  //   }
+
+  //   strip.show();
+  //   Serial.print("noise\t");
+  //   Serial.print(noise);
+
+  //   Serial.print("\tabs noise - background\t ");
+  //   Serial.println( activity);
+  //   noise = analogRead(micPin);
+  //   activity = abs(noise-background);
+  //   delay(500);
+  // }
+  // // Serial.print("noise\t");
+  // //   Serial.print(noise);
+  // //   Serial.print("\tabs noise - background\t ");
+  // //   Serial.println( abs(noise-background));
+  //    Serial.print("noise\t");
+  //   Serial.print(noise);
+
+  //   Serial.print("\tabs noise - background\t ");
+  //   Serial.println( activity);
+  // strip.fill(0, 0, 0);
+  // strip.show();
 
 
 
